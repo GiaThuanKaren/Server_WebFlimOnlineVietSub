@@ -12,7 +12,7 @@
 
 /movie/list?ds=phim-bo&page=10 (3)
 
-: to get all movie by name of list (1)
+: to get all movie by name of list [(1)]
 
 
 /find?keyword=hen+ho+chon+cong+so (4)
@@ -22,3 +22,9 @@
 /movie/gender?gender=hanh-dong (5)
 
 : to get all movies by gender
+
+
+/movie/:slug (6)
+
+: to get detail movie 
+
