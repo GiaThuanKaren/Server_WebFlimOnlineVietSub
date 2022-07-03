@@ -1,8 +1,14 @@
 const express = require("express");
 const routes = express.Router();
 const axious = require("axios").default;
+
 routes.get("/lastest", async (req, res) => {
-  console.log(req.query.page);
+  console.log(
+    req.query.page,
+    `https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=${
+      req.query.page ? req.query.page : 1
+    }`
+  );
   try {
     let result = await axious.get(
       `https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=${
@@ -16,7 +22,18 @@ routes.get("/lastest", async (req, res) => {
 
   // console.log(result.data)
 });
-
+routes.get("/:slug", async (req, res) => {
+  console.log(req.params.slug);
+  try {
+    let respone = await axious.get(
+      `https://ophim1.com/phim/${req.params.slug}`
+    );
+    res.json(respone.data);
+  } catch (e) {
+    console.log(e, 10);
+    res.status(404).json(e);
+  }
+});
 routes.get("/list", async (req, res) => {
   let queryDS = req.query.ds;
   let page = req.query.page;
