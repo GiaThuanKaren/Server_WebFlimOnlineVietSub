@@ -22,32 +22,21 @@ routes.get("/lastest", async (req, res) => {
 
   // console.log(result.data)
 });
-routes.get("/:slug", async (req, res) => {
-  console.log(req.params.slug);
-  try {
-    let respone = await axious.get(
-      `https://ophim1.com/phim/${req.params.slug}`
-    );
-    res.json(respone.data);
-  } catch (e) {
-    console.log(e, 10);
-    res.status(404).json(e);
-  }
-});
+
 routes.get("/list", async (req, res) => {
-  let queryDS = req.query.ds;
+  let queryDS = req.query.ds ? req.query.ds : "phim-moi";
   let page = req.query.page;
   try {
     // let getFilterCatologe = await axious.get("http://localhost:5000/fliterlist")
     // let check =getFilterCatologe.data.data[1];
     // console.log(check)
     let ListMovieBySlug = await axious.get(
-      `https://ophim.tv/_next/data/m5wySfMXDukfAvbiXTiQO/danh-sach/phim-moi.json?slug=${queryDS}&page=${
+      `https://ophim.tv/_next/data/m5wySfMXDukfAvbiXTiQO/danh-sach/${queryDS}.json?slug=${queryDS}&page=${
         page ? page : 1
       }`
     );
-    console.log(ListMovieBySlug.data);
-    res.send(ListMovieBySlug.data);
+    // console.log(ListMovieBySlug.data);
+    res.send(ListMovieBySlug.data.pageProps.data);
   } catch (e) {
     res.json(e);
   }
@@ -83,5 +72,16 @@ routes.get("/gender", async (req, res) => {
   }
   // https://ophim.tv/_next/data/m5wySfMXDukfAvbiXTiQO/danh-sach/phim-moi.json?slug=phim-moi&sort_field=_id&category=hanh-dong&country=&year=
 });
-
+routes.get("/:slug", async (req, res) => {
+  console.log(req.params.slug);
+  try {
+    let respone = await axious.get(
+      `https://ophim1.com/phim/${req.params.slug}`
+    );
+    res.json(respone.data);
+  } catch (e) {
+    console.log(e, 10);
+    res.status(404).json(e);
+  }
+});
 module.exports = routes;
