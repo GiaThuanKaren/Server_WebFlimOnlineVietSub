@@ -1,8 +1,55 @@
 const express = require("express");
 const routes = express.Router();
 const axious = require("axios").default;
+const PORTREDIS = process.env.PORT || 6379;
+const redis = require("redis");
+const client = redis.createClient();
 
-routes.get("/lastest", async (req, res) => {
+const ConnectRedis = async function () {
+  try {
+    let connect = await client.connect();
+  } catch (e) {
+    console.log(e)
+  }
+};
+ConnectRedis();
+const SetValueToRedis = async function (key, value) {
+  await client.set(key, JSON.stringify(value));
+};
+
+const GetValueOnRedis = async function (req,res,next) {
+    let key = req.originalUrl;
+    console.log(key)
+    try{
+      console.log("Getting data")
+      const value = await client.get(key);
+      if(value){
+        console.log("Getting cache")
+        res.json(JSON.parse(value))
+      }
+      else {
+        console.log("No Cached",value)
+        next();
+      }
+    }catch(e){
+      console.log("Errog Get Data redis",e)
+      res.status(404).json(e)
+      // throw new Error().message;
+    }
+};
+const get = (req, res, next) => {
+  let key = req.route.path;
+  redisClient.get(key, (error, data) => {
+    if (error) res.status(400).send(err);
+    if (data !== null) {
+      console.log("cached Getting")
+      res.status(200).send(JSON.parse(data));
+    }
+    else next();
+  });
+};
+
+routes.get("/lastest",GetValueOnRedis, async (req, res) => {
   console.log(
     req.query.page,
     `https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=${
@@ -15,6 +62,7 @@ routes.get("/lastest", async (req, res) => {
         req.query.page ? req.query.page : 1
       }`
     );
+    SetValueToRedis(req.originalUrl,result.data)
     res.send(result.data);
   } catch (e) {
     res.json(e);
@@ -23,7 +71,7 @@ routes.get("/lastest", async (req, res) => {
   // console.log(result.data)
 });
 
-routes.get("/list", async (req, res) => {
+routes.get("/list",GetValueOnRedis, async (req, res) => {
   let queryDS = req.query.ds ? req.query.ds : "phim-moi";
   let page = req.query.page;
   try {
@@ -35,8 +83,11 @@ routes.get("/list", async (req, res) => {
         page ? page : 1
       }`
     );
+    console.log("Respone",req.originalUrl)
+    SetValueToRedis(req.originalUrl,ListMovieBySlug.data.pageProps.data),
     // console.log(ListMovieBySlug.data);
     res.send(ListMovieBySlug.data.pageProps.data);
+
   } catch (e) {
     res.json(e);
   }
@@ -45,6 +96,7 @@ routes.get("/list", async (req, res) => {
 routes.get("/gender", async (req, res) => {
   let gender = req.query.gender;
   let page = req.query.page;
+  console.log(req)
   let ds = req.query.ds;
   try {
     console.log(

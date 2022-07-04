@@ -13,7 +13,7 @@ const FitlerCatologeCrawl = function (req, res) {
         let resutlGot = []
         $(ele).find("option").each((idx,elein)=>{
             // i++
-            console.log($(elein).text())
+            // console.log($(elein).text())
             const obj ={
               name:$(elein).text(),
               href:$(elein).attr("value")
@@ -25,7 +25,7 @@ const FitlerCatologeCrawl = function (req, res) {
         i++;
         
       })
-      console.log(i)
+      // console.log(i)
       res.json({
         name:"fliterCatologe",
         data:Result
